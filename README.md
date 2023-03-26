@@ -21,7 +21,7 @@
 ## 训练过程
 
 我们使用了一张 2080ti 显卡，在 17 个小时内训练了 188500 步。在训练过程中，我们的模型从初始的 loss 值 2.4 逐渐降低到了 0.9左右。
-![](p![](./png/loss.png)
+![loss](https://github.com/misaka2019/paper-search/blob/main/png/loss.png)
 ## 使用示例
 ### 环境配置
 ````
