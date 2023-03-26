@@ -1,0 +1,9 @@
+__pycache__/
+*.pyc
+.idea/
+/backup
+data/clean_text_list.txt
+data/csl_camera_readly.tsv
+data/train_unsupervised.csv
+chinese-roberta-wwm-ext/
+lamb.py
