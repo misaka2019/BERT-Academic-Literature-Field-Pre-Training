@@ -53,14 +53,13 @@ def get_sent_list(data_dir, val=True):
         return clean_text_list
 
 
-def get_keyword():
+def get_keyword(new_words_file):
     df = pd.read_csv('./data/csl_camera_readly.tsv', sep='\t', error_bad_lines=False, header=None)
     add_word = []
     for words in df[2]:
         add_word += words.split('_')
     add_word = list(set(add_word))
     # 读取新增词语的文本文件
-    new_words_file = 'new_words.txt'
     with open(new_words_file, 'w') as f:
         for item in add_word:
             f.write("%s " % item)
@@ -70,3 +69,15 @@ def get_keyword():
     # 将新增词语加入词典中
     for word in new_words.split():
         jieba.add_word(word)
+
+
+if __name__ == '__main__':
+    import argparse
+    parser = argparse.ArgumentParser(description='preprocess')
+
+    parser.add_argument('--data_dir', type=str, default='./data', help='Directory to store data')
+    parser.add_argument('--new_words_file', type=str, default='./data', help='Directory to store keywords')
+
+    args = parser.parse_args()
+    get_sent_list(args.data_dir)
+    get_keyword(args.new_words_file)

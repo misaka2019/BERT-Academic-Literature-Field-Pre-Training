@@ -1,34 +1,15 @@
+# -*- coding:utf-8 -*-
 from torch.utils.data import Dataset
 import torch
 import random
 import jieba
-from collections import defaultdict
 import numpy as np
-from tqdm import tqdm
-import pandas as pd
-from data.utils import *
-import jieba
-import os
-
-
-def get_sent_list(data_dir, val=True):
-    text_list = []
-    clean_text_list = []
-    if os.path.exists(data_dir):
-        # 保存文本
-        clean_text_list = open(data_dir, 'r').read().strip('\n')
-        train_num = int(len(clean_text_list) * 0.77777)
-        if val:
-            train_text = clean_text_list[:train_num]
-            val_text = clean_text_list[train_num:]
-            return train_text, val_text
-        else:
-            return clean_text_list[:train_num]
 
 
 class TextDataset(Dataset):
     def __init__(self, data_dir, tokenizer):
-        self.data = get_sent_list(data_dir, val=False)
+        self.data = open(data_dir, 'r').read().split('\n')
+        self.data = [i.strip(' ') for i in self.data if len(i.strip(' ')) > 10]
         self.data_dir = data_dir
         self.tokenizer = tokenizer
 
@@ -42,18 +23,13 @@ class TextDataset(Dataset):
             data_dict['token_type_ids'],
             data_dict['attention_mask'],
         )
+        # return {"input_ids": torch.tensor(data, dtype=torch.long)}
         return data
 
     def encode_sent(self, sent, tokenizer):
-        sent = sent.strip(' ')
-        inputs = defaultdict(list)
-        inputs_dict = tokenizer.encode_plus(sent, add_special_tokens=True,
-                                            return_token_type_ids=True, return_attention_mask=True)
-        inputs['input_ids'] = inputs_dict['input_ids']
-        inputs['token_type_ids'] = inputs_dict['token_type_ids']
-        inputs['attention_mask'] = inputs_dict['attention_mask']
+        inputs_dict = tokenizer(sent, add_special_tokens=True, truncation=True, max_length=max_seq_len)
 
-        return inputs
+        return inputs_dict
 
 
 class DataCollator:
@@ -153,7 +129,9 @@ class DataCollator:
         for input_ids in input_ids_list:
             # 随机获取遮罩词
             wwm_id = self.get_wwd(input_ids)
-            wwm_id = np.random.choice(wwm_id, int(len(input_ids) * 0.2))
+            if len(wwm_id) > len(input_ids) * 0.2:
+                wwm_id = np.random.choice(wwm_id, int(len(input_ids) * 0.2))
+
             # 给挑选出来的位置添加 "##"标记
             input_id_str = [f'##{id_}' if i in wwm_id else str(id_) for i, id_ in enumerate(input_ids)]
             mask_label = self._whole_word_mask(input_id_str, max_seq_len)
