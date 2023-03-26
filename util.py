@@ -27,7 +27,7 @@ class TextDataset(Dataset):
         return data
 
     def encode_sent(self, sent, tokenizer):
-        inputs_dict = tokenizer(sent, add_special_tokens=True, truncation=True, max_length=max_seq_len)
+        inputs_dict = tokenizer(sent, add_special_tokens=True, truncation=True, max_length=128)
 
         return inputs_dict
 
