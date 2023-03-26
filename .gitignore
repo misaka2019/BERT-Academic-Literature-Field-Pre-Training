@@ -7,3 +7,4 @@ data/csl_camera_readly.tsv
 data/train_unsupervised.csv
 chinese-roberta-wwm-ext/
 lamb.py
+.DS_Store
